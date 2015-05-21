@@ -6,6 +6,7 @@ require 'optparse'
 
 class ProjectCreator
   VERSION = '0.1.1'
+  CONFIG_PATH = Pathname(ENV['HOME']) + ".project_creator_config.yml"
 
   def initialize(project_name)
     @top_level_dir = Pathname(project_name)
@@ -41,7 +42,7 @@ class ProjectCreator
 
   def self.parse(args)
     options = OpenStruct.new
-    options.config = Pathname(ENV['HOME']) + ".project_creator_config.yml"
+    options.config = CONFIG_PATH
     opt_parser = OptionParser.new do |opts|
       opts.banner = "Usage: ProjectCreator [options]"
       opts.separator ""
