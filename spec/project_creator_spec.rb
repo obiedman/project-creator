@@ -19,17 +19,31 @@ RSpec.describe ProjectCreator do
     end
 
     it "reads a config file is specified with -c" do
-      yml_file = "given_config.yml"
-      allow_any_instance_of(ProjectCreator).to receive(:command_line_args).and_return(["-c", yml_file])
+      yml_file = Pathname "given_config.yml"
+      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:config => yml_file))
+      @subject = ProjectCreator.new(@project_name)
+      expect(@subject.options.config).to eq(yml_file)
+    end
+
+    it "reads a config file that is specified with --config" do
+      yml_file = Pathname "given_config.yml"
+      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:config => yml_file))
       @subject = ProjectCreator.new(@project_name)
       expect(@subject.options.config).to eq(Pathname(yml_file))
     end
 
-    it "reads a config file that is specified with --config" do
-      yml_file = "given_config.yml"
-      allow_any_instance_of(ProjectCreator).to receive(:command_line_args).and_return(["--config", yml_file])
+    it "reads the project type option specified with -p" do
+      project_type = "html"
+      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:project_type => project_type))
       @subject = ProjectCreator.new(@project_name)
-      expect(@subject.options.config).to eq(Pathname(yml_file))
+      expect(@subject.options.project_type).to eq(project_type)
+    end
+
+    it "reads the project type option specified with --project" do
+      project_type = "html"
+      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:project_type => project_type))
+      @subject = ProjectCreator.new(@project_name)
+      expect(@subject.options.project_type).to eq(project_type)
     end
   end
 
@@ -44,7 +58,7 @@ RSpec.describe ProjectCreator do
         @dir = Pathname(File.dirname(__FILE__))
         @loaded_yaml = @subject.fetch_yaml("#{@dir.parent}/sample_config.yml")
         expect(@loaded_yaml).to eq(
-          yaml_as_ruby
+          yaml_as_ruby.first["default"]
         )
       end
     end
@@ -53,9 +67,35 @@ RSpec.describe ProjectCreator do
       create_home_dir_yaml
       stub_const("ProjectCreator::CONFIG_FILENAME", ".project_config_sample.yml")
       @loaded_yaml = @subject.fetch_yaml
-      expect(@loaded_yaml).to eq(yaml_as_ruby)
+      expect(@loaded_yaml).to eq(yaml_as_ruby.first["default"])
       @filepath = Pathname(File.expand_path('~')) + ".project_config_sample.yml"
       FileUtils.rm(@filepath)
+    end
+
+    it "will create a YAML file in the home directory if none is found and user agrees" do
+      file_path = Pathname(File.expand_path('~')) + ".file_does_not_exist.yml"
+      stub_const("ProjectCreator::CONFIG_PATH", file_path)
+      stub_const("ProjectCreator::CONFIG_FILENAME", ".file_does_not_exist.yml")
+      @subject = ProjectCreator.new @project_name
+      @subject.stub(:gets) { "y" }
+      @loaded_yaml = @subject.fetch_yaml
+      expect(File.exist? file_path).to be(true)
+      FileUtils.rm(file_path)
+    end
+
+    it "will exit if user does not agree to create a config file" do
+      @subject.stub(:gets) { "N" }
+      stub_const("ProjectCreator::CONFIG_FILENAME", ".file_does_not_exist.yml")
+      expect { @subject.fetch_yaml }.to raise_exception(SystemExit)
+    end
+
+    it "will return yaml from a given project type" do
+      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new({"project_type" => "html"}))
+      ensure_yaml_file
+      @subject = ProjectCreator.new @project_name
+      @dir = Pathname(File.dirname(__FILE__))
+      @loaded_yaml = @subject.fetch_yaml("#{@dir.parent}/sample_config.yml")
+      expect(@loaded_yaml).to eq(yaml_as_ruby.first["html"])
     end
 
   end
@@ -81,12 +121,15 @@ RSpec.describe ProjectCreator do
     it "should build files in subfolders" do
       expect(File.exist? @top_level_dir + "js/subfolder/something.js")
     end
+
   end
 
   private
 
   def yaml_as_ruby
-    [{"js"=>["index.js", {"subfolder"=>["something.js"]}]}, "index.html", "images"]
+    [{"default"=>[{"js"=>["index.js", {"subfolder"=>["something.js"]}]}, "index.html", "images"],
+      "html" => ["index.html", "contact.html"]
+      }]
   end
 
   def ensure_yaml_file

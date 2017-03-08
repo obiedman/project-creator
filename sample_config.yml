@@ -1,7 +1,12 @@
 ---
-- js:
-  - index.js
-  - subfolder:
-    - something.js
-- index.html
-- images
+- default:
+  - js:
+    - index.js
+    - subfolder:
+      - something.js
+  - index.html
+  - images
+
+- html:
+  - index.html
+  - contact.html

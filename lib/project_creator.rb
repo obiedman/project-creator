@@ -9,12 +9,12 @@ require 'optparse'
 class ProjectCreator
   VERSION = '0.2.0'
   CONFIG_FILENAME = ".project_creator_config.yml"
-  CONFIG_PATH = Pathname(ENV['HOME']) + CONFIG_FILENAME
+  CONFIG_PATH = Pathname(File.expand_path('~')) + CONFIG_FILENAME
 
-  def initialize(project_name)
+  def initialize(project_name, options={})
     @top_level_dir = Pathname(project_name)
     FileUtils.mkdir_p(@top_level_dir)
-    @options = ProjectCreator.parse(command_line_args)
+    @options = OpenStruct.new options
   end
 
   def options
@@ -23,7 +23,10 @@ class ProjectCreator
 
   def fetch_yaml(config_path=@options.config)
     begin
-      YAML.load_file(config_path || find_config)
+      full_yaml = YAML.load_file(config_path || find_config)
+      project_type = options.project_type || "default"
+      full_yaml = full_yaml.reduce(:merge)
+      return full_yaml[project_type]
     rescue Errno::ENOENT, TypeError
       puts "\
       Oops! Could not find a config file. Please make sure a file named .project_creator_config.yml exists in your current directory or any of its parent directories, specify a path with the --config option, or change the default path for this class."
@@ -33,6 +36,7 @@ class ProjectCreator
 
   def build_file_structure(yaml=fetch_yaml, path=@top_level_dir)
     path = Pathname(path)
+    return unless yaml
     yaml.each do |file|
       if file.is_a?(Hash)
         file.values.each do |sub_file|
@@ -62,6 +66,10 @@ class ProjectCreator
         puts ""
         puts opts
         exit
+      end
+
+      opts.on("-p", "--project TYPE", "Specify a project type that matches a type in your config file") do |type|
+        options.project_type = type
       end
 
       opts.on_tail("-v", "--version", "Show Version number") do
@@ -95,6 +103,24 @@ class ProjectCreator
     while path != Pathname("/")
       return path + CONFIG_FILENAME if File.exist? path + CONFIG_FILENAME
       path = path.parent
+    end
+    return request_and_build_config
+  end
+
+  def request_and_build_config
+    puts "Could not find a config file. Would you like to create one now? [Y/n]"
+    input = gets.chomp.downcase
+    if input == "" || input == "y"
+
+      File.open(CONFIG_PATH, 'w') do |f|
+        f.puts "---"
+        f.puts "- default:"
+      end unless File.exist? CONFIG_PATH
+      puts "File created successfully."
+      return CONFIG_PATH
+    else
+
+      return nil
     end
   end
 
