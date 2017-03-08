@@ -24,7 +24,7 @@ class ProjectCreator
   def fetch_yaml(config_path=@options.config)
     begin
       YAML.load_file(config_path || find_config)
-    rescue Errno::ENOENT
+    rescue Errno::ENOENT, TypeError
       puts "\
       Oops! Could not find a config file. Please make sure a file named .project_creator_config.yml exists in your current directory or any of its parent directories, specify a path with the --config option, or change the default path for this class."
       exit(false)

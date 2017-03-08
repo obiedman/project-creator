@@ -51,9 +51,10 @@ RSpec.describe ProjectCreator do
 
     it "will find a YAML file in the home directory when no filename is provided" do
       create_home_dir_yaml
+      stub_const("ProjectCreator::CONFIG_FILENAME", ".project_config_sample.yml")
       @loaded_yaml = @subject.fetch_yaml
       expect(@loaded_yaml).to eq(yaml_as_ruby)
-      @filepath = Pathname(File.expand_path('~')) + "project_config_sample.yml"
+      @filepath = Pathname(File.expand_path('~')) + ".project_config_sample.yml"
       FileUtils.rm(@filepath)
     end
 
@@ -98,7 +99,7 @@ RSpec.describe ProjectCreator do
 
   def create_home_dir_yaml
     @dir = Pathname(File.expand_path('~'))
-    @file = @dir + "project_config_sample.yml"
+    @file = @dir + ".project_config_sample.yml"
     File.open(@file, 'w') do |f|
       f.write YAML.dump(yaml_as_ruby)
     end unless File.exist? @file
