@@ -7,12 +7,16 @@ require 'ostruct'
 require 'optparse'
 
 class ProjectCreator
+  # TODO: ask to overwrite
+  # TODO: extract options parser logic into separate class
+  # TODO: rename to mise-en-place
   VERSION = '0.2.0'
   CONFIG_FILENAME = ".project_creator_config.yml"
   CONFIG_PATH = Pathname(File.expand_path('~')) + CONFIG_FILENAME
 
   def initialize(project_name, options={})
     @top_level_dir = Pathname(project_name)
+    request_and_overwrite if File.exist? @top_level_dir
     FileUtils.mkdir_p(@top_level_dir)
     @options = OpenStruct.new options
   end
@@ -108,8 +112,7 @@ class ProjectCreator
   end
 
   def request_and_build_config
-    puts "Could not find a config file. Would you like to create one now? [Y/n]"
-    input = gets.chomp.downcase
+    input = ask_to_build_config
     if input == "" || input == "y"
 
       File.open(CONFIG_PATH, 'w') do |f|
@@ -121,6 +124,26 @@ class ProjectCreator
     else
 
       return nil
+    end
+  end
+
+  def ask_to_build_config
+    puts "Could not find a config file. Would you like to create one now? [Y/n]"
+    gets.chomp.downcase
+  end
+
+  def ask_to_overwrite
+    puts "A folder with #{@top_level_dir} already exists. Overwrite?
+    [y/N]"
+    gets.chomp.downcase
+  end
+
+  def request_and_overwrite
+    input = ask_to_overwrite
+    if input == "y"
+      return true
+    else
+      exit(false)
     end
   end
 

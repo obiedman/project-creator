@@ -2,7 +2,6 @@
 
 require_relative '../lib/project_creator'
 
-# ProjectCreator.parse(ARGV)
 project_name = ARGV.shift
 if project_name == nil
   puts "Please specify a project name!"
@@ -10,5 +9,4 @@ if project_name == nil
 end
 options = ProjectCreator.parse(ARGV)
 creator = ProjectCreator.new(project_name, options)
-# creator = ProjectCreator.parse
 creator.build_file_structure
