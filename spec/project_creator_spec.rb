@@ -1,11 +1,11 @@
-require 'project_creator'
+require 'mise'
 
-RSpec.describe ProjectCreator do
+RSpec.describe MiseEnPlace::Mise do
 
   before(:each) do
     @project_name = "test"
     @pwd = Dir.pwd
-    @subject = ProjectCreator.new(@project_name)
+    @subject = MiseEnPlace::Mise.new(@project_name)
   end
 
   after(:each) do
@@ -19,15 +19,15 @@ RSpec.describe ProjectCreator do
     end
 
     it "stops execution if folder already exists and user wishes not to overwrite" do
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_overwrite).and_return("n")
-      expect { ProjectCreator.new(@project_name) }.to raise_exception(SystemExit)
+      allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_overwrite).and_return("n")
+      expect { MiseEnPlace::Mise.new(@project_name) }.to raise_exception(SystemExit)
     end
 
     it "reads a config file is specified with -c" do
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_overwrite).and_return("y")
+      allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_overwrite).and_return("y")
       yml_file = Pathname "given_config.yml"
-      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:config => yml_file))
-      @subject = ProjectCreator.new(@project_name)
+      allow_any_instance_of(MiseEnPlace::Mise).to receive(:options).and_return(OpenStruct.new(:config => yml_file))
+      @subject = MiseEnPlace::Mise.new(@project_name)
       expect(@subject.options.config).to eq(yml_file)
     end
   end
@@ -50,7 +50,7 @@ RSpec.describe ProjectCreator do
 
     it "will find a YAML file in the home directory when no filename is provided" do
       create_home_dir_yaml
-      stub_const("ProjectCreator::CONFIG_FILENAME", ".project_config_sample.yml")
+      stub_const("MiseEnPlace::Mise::CONFIG_FILENAME", ".project_config_sample.yml")
       @loaded_yaml = @subject.fetch_yaml
       expect(@loaded_yaml).to eq(yaml_as_ruby.first["default"])
       @filepath = Pathname(File.expand_path('~')) + ".project_config_sample.yml"
@@ -59,25 +59,25 @@ RSpec.describe ProjectCreator do
 
     it "will create a YAML file in the home directory if none is found and user agrees" do
       file_path = Pathname(File.expand_path('~')) + ".file_does_not_exist.yml"
-      stub_const("ProjectCreator::CONFIG_PATH", file_path)
-      stub_const("ProjectCreator::CONFIG_FILENAME", ".file_does_not_exist.yml")
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_build_config).and_return("y")
+      stub_const("MiseEnPlace::Mise::CONFIG_PATH", file_path)
+      stub_const("MiseEnPlace::Mise::CONFIG_FILENAME", ".file_does_not_exist.yml")
+      allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_build_config).and_return("y")
       @loaded_yaml = @subject.fetch_yaml
       expect(File.exist? file_path).to be(true)
       FileUtils.rm(file_path)
     end
 
     it "will exit if user does not agree to create a config file" do
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_build_config).and_return("n")
-      stub_const("ProjectCreator::CONFIG_FILENAME", ".file_does_not_exist.yml")
+      allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_build_config).and_return("n")
+      stub_const("MiseEnPlace::Mise::CONFIG_FILENAME", ".file_does_not_exist.yml")
       expect { @subject.fetch_yaml }.to raise_exception(SystemExit)
     end
 
     it "will return yaml from a given project type" do
-      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new({"project_type" => "html"}))
+      allow_any_instance_of(MiseEnPlace::Mise).to receive(:options).and_return(OpenStruct.new({"project_type" => "html"}))
       ensure_yaml_file
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_overwrite).and_return("y")
-      @subject = ProjectCreator.new @project_name
+      allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_overwrite).and_return("y")
+      @subject = MiseEnPlace::Mise.new @project_name
       @dir = Pathname(File.dirname(__FILE__))
       @loaded_yaml = @subject.fetch_yaml("#{@dir.parent}/sample_config.yml")
       expect(@loaded_yaml).to eq(yaml_as_ruby.first["html"])

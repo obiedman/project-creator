@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require_relative '../lib/project_creator'
+require_relative '../lib/mise'
 require_relative '../lib/parser'
 
 project_name = ARGV.shift
@@ -8,6 +8,6 @@ if project_name == nil
   puts "Please specify a project name!"
   exit(false)
 end
-options = Parser.parse(ARGV)
-creator = ProjectCreator.new(project_name, options)
+options = MiseEnPlace::Parser.parse(ARGV)
+creator = MiseEnPlace::Mise.new(project_name, options)
 creator.build_file_structure
