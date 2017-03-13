@@ -8,8 +8,6 @@ require 'optparse'
 
 module MiseEnPlace
   class Mise
-    # TODO: rename to mise-en-place
-    VERSION = '0.2.0'
     CONFIG_FILENAME = ".project_creator_config.yml"
     CONFIG_PATH = Pathname(File.expand_path('~')) + CONFIG_FILENAME
 

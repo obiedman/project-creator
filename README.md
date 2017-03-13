@@ -1,15 +1,40 @@
-# ProjectCreator
+# MiseEnPlace
 
-Be sure to create a config file somewhere on your system. The script defaults to searching for it in ```~/.project_creator_config.yml```. For ease of use I suggest 
-putting it there, but if you decide you'd like it somewhere else just change the CONFIG_PATH constant:
+Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/mise_en_place`. To experiment with that code, run `bin/console` for an interactive prompt.
+
+TODO: Delete this and the text above, and describe your gem
+
+## Installation
+
+Add this line to your application's Gemfile:
 
 ```ruby
-CONFIG_PATH = Pathname(ENV['HOME']) + ".project_creator_config.yml"
+gem 'mise_en_place'
 ```
 
-You can check out a sample config file [HERE](sample_config.yml). Just match it to however you prefer your project's structure and you're ready to go. Note that the config file should reflect the structure you want INSIDE your project's folder, excluding the root level folder name. That top level directory will be 
-created when the script is run, and everything in the config file will be created inside that folder.
+And then execute:
 
-Once the script is in your path, the usage is simple: ```ProjectCreator [project name]```
+    $ bundle
 
-Use ```-h``` or ```--help``` flag for more info. 
+Or install it yourself as:
+
+    $ gem install mise_en_place
+
+## Usage
+
+TODO: Write usage instructions here
+
+## Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/mise_en_place.
+
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

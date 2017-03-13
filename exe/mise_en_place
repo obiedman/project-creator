@@ -1,7 +1,7 @@
 #! /usr/bin/env ruby
 
-require_relative '../lib/mise'
-require_relative '../lib/parser'
+require 'mise_en_place/mise'
+require 'mise_en_place/parser'
 
 project_name = ARGV.shift
 if project_name == nil
