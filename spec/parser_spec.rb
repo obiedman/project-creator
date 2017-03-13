@@ -1,6 +1,33 @@
-require 'parser'
+require 'mise_en_place/parser'
 
 RSpec.describe MiseEnPlace::Parser do
+
+  context 'project name' do
+    it 'sets a project name with the given name' do
+      @project_name = 'mise_en_place'
+      @args = [@project_name]
+      @options = MiseEnPlace::Parser.parse(@args)
+      expect(@options.project_name).to eq(@project_name)
+    end
+
+    context 'failure' do
+      it 'exits if no project name is given' do
+        allow(MiseEnPlace::Parser).to receive(:exit)
+        expect(MiseEnPlace::Parser).to receive(:exit)
+        MiseEnPlace::Parser.parse []
+      end
+
+      MiseEnPlace::Parser::FLAGS.each do |flag|
+        it "exits because of #{flag}" do
+          @project_name = flag
+          @args = [@project_name, "option"]
+          allow(MiseEnPlace::Parser).to receive(:exit)
+          expect(MiseEnPlace::Parser).to receive(:exit)
+          MiseEnPlace::Parser.parse @args
+        end
+      end
+    end
+  end
 
   context 'config' do
     before(:each) do
@@ -8,13 +35,13 @@ RSpec.describe MiseEnPlace::Parser do
     end
 
     it 'should set a path for config file with -c' do
-      @args = ["-c", @file_path]
+      @args = ['mise_en_place', "-c", @file_path]
       @options = MiseEnPlace::Parser.parse(@args)
       expect(@options.config).to eq(Pathname(@file_path))
     end
 
     it 'should set a path for config file with --config' do
-      @args = ["--config", @file_path]
+      @args = ['mise_en_place', "--config", @file_path]
       @options = MiseEnPlace::Parser.parse(@args)
       expect(@options.config).to eq(Pathname(@file_path))
     end
@@ -26,13 +53,13 @@ RSpec.describe MiseEnPlace::Parser do
     end
 
     it 'should set the project type with -p' do
-      @args = ['-p', @project_type]
+      @args = ['mise_en_place', '-p', @project_type]
       @options = MiseEnPlace::Parser.parse(@args)
       expect(@options.project_type).to eq(@project_type)
     end
 
     it 'should set the project type with --project' do
-      @args = ['--project', @project_type]
+      @args = ['mise_en_place', '--project', @project_type]
       @options = MiseEnPlace::Parser.parse(@args)
       expect(@options.project_type).to eq(@project_type)
     end

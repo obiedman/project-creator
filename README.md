@@ -22,8 +22,27 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Basic usage is `mise_en_place PROJECT_NAME`.
 
+By default Mise looks in the current directory and up for a .mise_en_place.yml file, but you can specify the location of a config file with `-c` or `--config`.
+
+A config file should look something like this:
+
+```yaml
+---
+- default:
+  - js:
+    - index.js
+    - subfolder:
+      - something.js
+  - index.html
+  - images
+
+- html:
+  - index.html
+  - contact.html
+```
+The `default` structure is required, and will be used in the absence of the project flag. To use a different structure specify the type with `-p` or `--project`
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -32,7 +51,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/mise_en_place.
+Bug reports and pull requests are welcome on GitHub at https://github.com/pmo3/mise_en_place.
 
 
 ## License

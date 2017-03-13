@@ -1,11 +1,11 @@
-require 'mise'
+require 'mise_en_place/mise'
 
 RSpec.describe MiseEnPlace::Mise do
 
   before(:each) do
     @project_name = "test"
     @pwd = Dir.pwd
-    @subject = MiseEnPlace::Mise.new(@project_name)
+    @subject = MiseEnPlace::Mise.new({:project_name => @project_name})
   end
 
   after(:each) do
@@ -20,21 +20,30 @@ RSpec.describe MiseEnPlace::Mise do
 
     it "stops execution if folder already exists and user wishes not to overwrite" do
       allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_overwrite).and_return("n")
-      expect { MiseEnPlace::Mise.new(@project_name) }.to raise_exception(SystemExit)
+      expect { MiseEnPlace::Mise.new({:project_name => @project_name}) }.to raise_exception(SystemExit)
     end
 
-    it "reads a config file is specified with -c" do
+    it "reads a config file that is specified with -c" do
       allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_overwrite).and_return("y")
       yml_file = Pathname "given_config.yml"
       allow_any_instance_of(MiseEnPlace::Mise).to receive(:options).and_return(OpenStruct.new(:config => yml_file))
-      @subject = MiseEnPlace::Mise.new(@project_name)
+      @subject = MiseEnPlace::Mise.new(:project_name => @project_name)
       expect(@subject.options.config).to eq(yml_file)
     end
   end
 
   context "read YAML" do
     it "will exit when no YAML file exists" do
-      expect { @subject.fetch_yaml("file_does_not_exist") }.to raise_exception(SystemExit)
+      allow(@subject).to receive(:exit)
+      expect(@subject).to receive(:exit)
+      @subject.fetch_yaml("file_does_not_exist")
+    end
+
+    it 'will exit when no matching project type exists' do
+      allow(@subject).to receive(:exit)
+      allow(YAML).to receive(:load_file).and_return(nil)
+      expect(@subject).to receive(:exit)
+      @subject.fetch_yaml
     end
 
     context "finds a YAML file" do
@@ -68,16 +77,18 @@ RSpec.describe MiseEnPlace::Mise do
     end
 
     it "will exit if user does not agree to create a config file" do
-      allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_build_config).and_return("n")
+      allow(@subject).to receive(:ask_to_build_config).and_return("n")
       stub_const("MiseEnPlace::Mise::CONFIG_FILENAME", ".file_does_not_exist.yml")
-      expect { @subject.fetch_yaml }.to raise_exception(SystemExit)
+      allow(@subject).to receive(:exit)
+      expect(@subject).to receive(:exit)
+      @subject.fetch_yaml
     end
 
     it "will return yaml from a given project type" do
       allow_any_instance_of(MiseEnPlace::Mise).to receive(:options).and_return(OpenStruct.new({"project_type" => "html"}))
       ensure_yaml_file
       allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_overwrite).and_return("y")
-      @subject = MiseEnPlace::Mise.new @project_name
+      @subject = MiseEnPlace::Mise.new :project_name => @project_name
       @dir = Pathname(File.dirname(__FILE__))
       @loaded_yaml = @subject.fetch_yaml("#{@dir.parent}/sample_config.yml")
       expect(@loaded_yaml).to eq(yaml_as_ruby.first["html"])
@@ -106,7 +117,6 @@ RSpec.describe MiseEnPlace::Mise do
     it "should build files in subfolders" do
       expect(File.exist? @top_level_dir + "js/subfolder/something.js")
     end
-
   end
 
   private

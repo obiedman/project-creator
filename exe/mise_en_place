@@ -3,11 +3,6 @@
 require 'mise_en_place/mise'
 require 'mise_en_place/parser'
 
-project_name = ARGV.shift
-if project_name == nil
-  puts "Please specify a project name!"
-  exit(false)
-end
 options = MiseEnPlace::Parser.parse(ARGV)
-creator = MiseEnPlace::Mise.new(project_name, options)
+creator = MiseEnPlace::Mise.new(options)
 creator.build_file_structure

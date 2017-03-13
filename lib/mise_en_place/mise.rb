@@ -8,14 +8,14 @@ require 'optparse'
 
 module MiseEnPlace
   class Mise
-    CONFIG_FILENAME = ".project_creator_config.yml"
+    CONFIG_FILENAME = ".mise_en_place.yml"
     CONFIG_PATH = Pathname(File.expand_path('~')) + CONFIG_FILENAME
 
-    def initialize(project_name, options={})
-      @top_level_dir = Pathname(project_name)
+    def initialize(options={})
+      @options = OpenStruct.new options
+      @top_level_dir = Pathname(@options.project_name)
       request_and_overwrite if File.exist? @top_level_dir
       FileUtils.mkdir_p(@top_level_dir)
-      @options = OpenStruct.new options
     end
 
     def options
@@ -25,12 +25,17 @@ module MiseEnPlace
     def fetch_yaml(config_path=@options.config)
       begin
         full_yaml = YAML.load_file(config_path || find_config)
+        unless full_yaml
+          warn_no_project_type
+          return
+        end
         project_type = options.project_type || "default"
-        full_yaml = full_yaml.reduce(:merge)
-        return full_yaml[project_type]
+        full_yaml = full_yaml.reduce(:merge)[project_type]
+        warn_no_project_type unless full_yaml
+        return full_yaml
       rescue Errno::ENOENT, TypeError
         puts "\
-        Oops! Could not find a config file. Please make sure a file named .project_creator_config.yml exists in your current directory or any of its parent directories, specify a path with the --config option, or change the default path for this class."
+        Please make sure a file named #{CONFIG_FILENAME} exists in your current directory or any of its parent directories or specify a path with the --config option"
         exit(false)
       end
     end
@@ -52,38 +57,21 @@ module MiseEnPlace
       end
     end
 
-    def self.parse(args)
-      options = OpenStruct.new
-      opt_parser = OptionParser.new do |opts|
-        opts.banner = "Usage: ProjectCreator [project_title] [options]"
-        opts.separator ""
-        opts.separator "Specific Options:"
-
-        opts.on("-c", "--config PATH", "Path to your config file") do |path|
-          options.config = Pathname(path)
-        end
-
-        opts.on("-h", "--help", "Show this message") do
-          puts ""
-          puts opts
-          exit
-        end
-
-        opts.on("-p", "--project TYPE", "Specify a project type that matches a type in your config file") do |type|
-          options.project_type = type
-        end
-
-        opts.on_tail("-v", "--version", "Show Version number") do
-          puts VERSION
-          exit
-        end
-
-      end
-      opt_parser.parse!(args)
-      options
-    end
-
     private
+
+    def warn_no_project_type
+      puts "\
+      Could not find a valid yaml structure for your project. Make sure that a default structure or one for your project type exists in your config file. Try something like this:
+
+      ---
+      - default:
+        - file_structure_here
+      "
+      puts "\
+      - #{options.project_type}
+        - file_structure_here" if options.project_type
+      exit(false)
+    end
 
     def create_file_or_dir(file_or_dir, path)
       full_path = Pathname(path + file_or_dir)
@@ -116,7 +104,7 @@ module MiseEnPlace
           f.puts "---"
           f.puts "- default:"
         end unless File.exist? CONFIG_PATH
-        puts "File created successfully."
+        puts "File created at #{CONFIG_PATH}. Add your desired project structure under default and run MiseEnPlace again."
         return CONFIG_PATH
       else
 

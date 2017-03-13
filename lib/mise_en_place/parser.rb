@@ -1,7 +1,13 @@
+require 'ostruct'
+require 'optparse'
+
 module MiseEnPlace
   class Parser
+    FLAGS = %w(-c --config -h --help -p --project)
+
     def self.parse(args)
       options = OpenStruct.new
+
       opt_parser = OptionParser.new do |opts|
         opts.banner = "Usage: ProjectCreator [project_title] [options]"
         opts.separator ""
@@ -28,7 +34,21 @@ module MiseEnPlace
 
       end
       opt_parser.parse!(args)
+      project_name = args.shift
+      unless valid_project_name? project_name
+        puts "Please specify a project name"
+        exit(false)
+      end
+      options.project_name = project_name
       options
+    end
+
+    private
+
+    def self.valid_project_name?(project_name)
+      is_flag = FLAGS.include? project_name
+      does_not_exist = (project_name == nil)
+      return !(is_flag || does_not_exist)
     end
   end
 end
