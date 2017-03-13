@@ -30,30 +30,6 @@ RSpec.describe ProjectCreator do
       @subject = ProjectCreator.new(@project_name)
       expect(@subject.options.config).to eq(yml_file)
     end
-
-    it "reads a config file that is specified with --config" do
-      yml_file = Pathname "given_config.yml"
-      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:config => yml_file))
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_overwrite).and_return("y")
-      @subject = ProjectCreator.new(@project_name)
-      expect(@subject.options.config).to eq(Pathname(yml_file))
-    end
-
-    it "reads the project type option specified with -p" do
-      project_type = "html"
-      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:project_type => project_type))
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_overwrite).and_return("y")
-      @subject = ProjectCreator.new(@project_name)
-      expect(@subject.options.project_type).to eq(project_type)
-    end
-
-    it "reads the project type option specified with --project" do
-      project_type = "html"
-      allow_any_instance_of(ProjectCreator).to receive(:options).and_return(OpenStruct.new(:project_type => project_type))
-      allow_any_instance_of(ProjectCreator).to receive(:ask_to_overwrite).and_return("y")
-      @subject = ProjectCreator.new(@project_name)
-      expect(@subject.options.project_type).to eq(project_type)
-    end
   end
 
   context "read YAML" do

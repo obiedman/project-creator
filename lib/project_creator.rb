@@ -7,8 +7,6 @@ require 'ostruct'
 require 'optparse'
 
 class ProjectCreator
-  # TODO: ask to overwrite
-  # TODO: extract options parser logic into separate class
   # TODO: rename to mise-en-place
   VERSION = '0.2.0'
   CONFIG_FILENAME = ".project_creator_config.yml"

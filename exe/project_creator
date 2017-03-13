@@ -1,12 +1,13 @@
 #! /usr/bin/env ruby
 
 require_relative '../lib/project_creator'
+require_relative '../lib/parser'
 
 project_name = ARGV.shift
 if project_name == nil
   puts "Please specify a project name!"
   exit(false)
 end
-options = ProjectCreator.parse(ARGV)
+options = Parser.parse(ARGV)
 creator = ProjectCreator.new(project_name, options)
 creator.build_file_structure
