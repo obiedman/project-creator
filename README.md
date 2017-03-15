@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pmo3/mise_en_place.svg?branch=master)](https://travis-ci.org/pmo3/mise_en_place)
+
 # MiseEnPlace
 
 MiseEnPlace is a ruby gem made for quick and easy bootstrapping of new projects. By specifying your desired directory structure in YAML files, you can create folders and files for complex projects with one command.
