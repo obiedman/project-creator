@@ -1,9 +1,6 @@
 # MiseEnPlace
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/mise_en_place`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
+MiseEnPlace is a ruby gem made for quick and easy bootstrapping of new projects. By specifying your desired directory structure in YAML files, you can create folders and files for complex projects with one command.
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -24,7 +21,7 @@ Or install it yourself as:
 
 Basic usage is `mise_en_place PROJECT_NAME`.
 
-By default Mise looks in the current directory and up for a .mise_en_place.yml file, but you can specify the location of a config file with `-c` or `--config`.
+By default Mise looks in the current directory and its parents for a .mise_en_place.yml file, but you can specify the location of a config file with `-c` or `--config`.
 
 A config file should look something like this:
 

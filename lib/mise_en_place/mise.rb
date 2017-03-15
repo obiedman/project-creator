@@ -71,6 +71,7 @@ module MiseEnPlace
       - #{options.project_type}
         - file_structure_here" if options.project_type
       exit(false)
+      return
     end
 
     def create_file_or_dir(file_or_dir, path)
@@ -118,8 +119,7 @@ module MiseEnPlace
     end
 
     def ask_to_overwrite
-      puts "A folder with #{@top_level_dir} already exists. Overwrite?
-      [y/N]"
+      puts "A folder with #{@top_level_dir} already exists. Overwrite? [y/N]"
       gets.chomp.downcase
     end
 

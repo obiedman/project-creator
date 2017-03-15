@@ -1,5 +1,6 @@
 require 'ostruct'
 require 'optparse'
+require 'pathname'
 
 module MiseEnPlace
   class Parser

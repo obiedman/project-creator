@@ -6,6 +6,8 @@ RSpec.describe MiseEnPlace::Mise do
     @project_name = "test"
     @pwd = Dir.pwd
     @subject = MiseEnPlace::Mise.new({:project_name => @project_name})
+    # suppress terminal output
+    allow_any_instance_of(MiseEnPlace::Mise).to receive(:puts)
   end
 
   after(:each) do
@@ -70,7 +72,8 @@ RSpec.describe MiseEnPlace::Mise do
       file_path = Pathname(File.expand_path('~')) + ".file_does_not_exist.yml"
       stub_const("MiseEnPlace::Mise::CONFIG_PATH", file_path)
       stub_const("MiseEnPlace::Mise::CONFIG_FILENAME", ".file_does_not_exist.yml")
-      allow_any_instance_of(MiseEnPlace::Mise).to receive(:ask_to_build_config).and_return("y")
+      allow(@subject).to receive(:ask_to_build_config).and_return("y")
+      allow(@subject).to receive(:exit)
       @loaded_yaml = @subject.fetch_yaml
       expect(File.exist? file_path).to be(true)
       FileUtils.rm(file_path)

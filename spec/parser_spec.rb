@@ -2,6 +2,11 @@ require 'mise_en_place/parser'
 
 RSpec.describe MiseEnPlace::Parser do
 
+  before(:each) do
+    # suppress terminal output
+    allow(MiseEnPlace::Parser).to receive(:puts)
+  end
+
   context 'project name' do
     it 'sets a project name with the given name' do
       @project_name = 'mise_en_place'

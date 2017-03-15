@@ -10,6 +10,7 @@ Gem::Specification.new do |spec|
  spec.email       = ["patrick@patrickmobrien.com"]
  spec.homepage    = "http://rubygems.org/gems/mise_en_place"
  spec.summary     = %q{A gem to quickly bootstrap new projects by specifying directory structure in yaml files}
+ spec.description = %q{MiseEnPlace is a ruby gem made for quick and easy bootstrapping of new projects. By specifying your desired directory structure in YAML files, you can create folders and files for complex projects with one command.}
  spec.license       = "MIT"
 
  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
